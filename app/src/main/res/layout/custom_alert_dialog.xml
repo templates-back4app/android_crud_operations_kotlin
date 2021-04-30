@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_gravity="center"
+    android:layout_height="wrap_content">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:gravity="end"
+                android:text="Title"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>
+
+            <EditText
+                android:id="@+id/titleInput"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:hint="Title"
+                android:padding="10dp"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:background="@drawable/edittext_bg"
+                android:inputType="text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:gravity="end"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Description" />
+
+            <EditText
+                android:id="@+id/descriptionInput"
+                android:hint="Description"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:padding="10dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_bg"
+                android:inputType="text" />
+
+        </LinearLayout>
+
+        <TableRow android:gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/button_cancel_user_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:gravity="center"
+                android:text="Cancel"
+                android:textAllCaps="false"
+                android:textSize="14sp" />
+
+
+            <Button
+                android:id="@+id/button_save_todo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:gravity="center"
+                android:text="Save TODO"
+                android:textAllCaps="false"
+                android:textSize="14sp" />
+
+        </TableRow>
+
+    </TableLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
