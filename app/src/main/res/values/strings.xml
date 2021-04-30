@@ -2,6 +2,6 @@
     <string name="app_name">CRUD_guide_kotlin</string>
 
     <string name="back4app_server_url" translatable="false">https://parseapi.back4app.com/</string>
-    <string name="back4app_app_id" translatable="false">2vNlwOkQunS9rVbTdLB2MC6j3Q8CrU89trqu1O1J</string>
-    <string name="back4app_client_key" translatable="false">StYRzCLoVAXsiQ6UU50oBRBqQY5eAzMp88cwbNtc</string>
+    <string name="back4app_app_id" translatable="false">Your app id here</string>
+    <string name="back4app_client_key" translatable="false">Your client key here</string>
 </resources>
