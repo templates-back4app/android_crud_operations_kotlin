@@ -12,7 +12,7 @@ import com.parse.ParseObject
 
 class TodoAdapter(private val list: ArrayList<ParseObject>, private val context: Context) : RecyclerView.Adapter<TodoHolder>() {
     var clickListenerToEdit = MutableLiveData<ParseObject>()
-    var clickListenerToDelete = MutableLiveData<ParseObject>()
+    var onDeleteListener = MutableLiveData<ParseObject>()
 
 
 
@@ -33,7 +33,7 @@ class TodoAdapter(private val list: ArrayList<ParseObject>, private val context:
         }
 
         holder.delete!!.setOnClickListener { v: View? ->
-            clickListenerToDelete.postValue(
+            onDeleteListener.postValue(
                 `object`
             )
         }

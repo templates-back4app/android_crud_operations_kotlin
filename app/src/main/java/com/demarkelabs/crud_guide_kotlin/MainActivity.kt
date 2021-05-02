@@ -1,23 +1,17 @@
 package com.demarkelabs.crud_guide_kotlin
 
 import android.app.ProgressDialog
-import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.parse.GetCallback
-import com.parse.ParseException
 import com.parse.ParseObject
 import com.parse.ParseQuery
 
@@ -40,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         initMainActivityControls()
         getTodoList()
 
-        openInputPopupDialogButton?.setOnClickListener { view ->
+        openInputPopupDialogButton?.setOnClickListener { fabButtonView ->
             val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
             alertDialogBuilder.setTitle("Create a TODO")
             alertDialogBuilder.setCancelable(true)
@@ -49,50 +43,54 @@ class MainActivity : AppCompatActivity() {
             alertDialogBuilder.setView(popupInputDialogView)
             val alertDialog = alertDialogBuilder.create()
             alertDialog.show()
-
-
-            saveTodoButton?.setOnClickListener { view2 ->
-                val todo = ParseObject("Todo")
-                if (titleInput?.text.toString().isNotEmpty() && descriptionInput?.text
-                        .toString().isNotEmpty()
-                ) {
-                    alertDialog.cancel()
-                    progressDialog?.show()
-                    todo.put("title", titleInput?.text.toString())
-                    todo.put("description", descriptionInput?.text.toString())
-                    todo.saveInBackground { e ->
-                        progressDialog?.dismiss()
-                        if (e == null) {
-                            getTodoList()
-                        } else {
-                            showAlert("Error", e.message!!)
-                        }
-                    }
-                } else {
-                    showAlert("Error", "Please enter a title and description")
-                }
+            saveTodoButton?.setOnClickListener { saveButtonView ->
+                saveData(alertDialog)
             }
-            cancelUserDataButton?.setOnClickListener { view1 ->
+            cancelUserDataButton?.setOnClickListener { cancelButtonView ->
                 alertDialog.cancel()
             }
+        }
+    }
+
+    private fun saveData(alertDialog: AlertDialog) {
+        val todo = ParseObject("Todo")
+        if (titleInput?.text.toString().isNotEmpty() && descriptionInput?.text
+                .toString().isNotEmpty()
+        ) {
+            alertDialog.cancel()
+            progressDialog?.show()
+            todo.put("title", titleInput?.text.toString())
+            todo.put("description", descriptionInput?.text.toString())
+            todo.saveInBackground { e ->
+                progressDialog?.dismiss()
+                if (e == null) {
+                    //We saved the object and fetching data again
+                    getTodoList()
+                } else {
+                    //We have an error.We are showing error message here.
+                    showAlert("Error", e.message!!)
+                }
+            }
+        } else {
+            showAlert("Error", "Please enter a title and description")
         }
     }
 
     private fun initMainActivityControls() {
         recyclerView = findViewById(R.id.recyclerView)
         empty_text = findViewById(R.id.empty_text)
-        if (openInputPopupDialogButton == null) {
-            openInputPopupDialogButton = findViewById(R.id.fab)
-        }
+        openInputPopupDialogButton = findViewById(R.id.fab)
     }
 
     private fun getTodoList() {
         progressDialog?.show()
         val query = ParseQuery.getQuery<ParseObject>("Todo")
+        //We use this code to fetch data from newest to oldest.
         query.orderByDescending("createdAt")
         query.findInBackground { objects, e ->
             progressDialog?.dismiss()
             if (e == null) {
+                //We are initializing Todo object list to our adapter
                 initTodoList(objects)
             } else {
                 showAlert("Error", e.message!!)
@@ -101,22 +99,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initTodoList(list: List<ParseObject>?) {
-        if (list != null && list.isEmpty())
-            empty_text?.visibility = View.VISIBLE
-        else if (list != null)
-            empty_text?.visibility = View.GONE
-        else {
-            empty_text?.visibility = View.GONE
-            Toast.makeText(this, "Something went wrong!", Toast.LENGTH_SHORT).show()
+        if (list == null || list.isEmpty()) {
+            empty_text!!.visibility = View.VISIBLE
+            return
         }
+        empty_text?.visibility = View.GONE
 
         val adapter = TodoAdapter(list as ArrayList<ParseObject>, this)
 
-        adapter.clickListenerToDelete.observe(this@MainActivity, { parseObject ->
+        adapter.onDeleteListener.observe(this@MainActivity, { parseObject ->
             progressDialog?.show()
             parseObject.deleteInBackground { e ->
                 progressDialog?.dismiss()
                 if (e == null) {
+                    //We deleted the object and fetching data again.
                     getTodoList()
                 } else {
                     showAlert("Error", e.message!!)
@@ -128,34 +124,30 @@ class MainActivity : AppCompatActivity() {
             val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
             alertDialogBuilder.setTitle("Update a TODO")
             alertDialogBuilder.setCancelable(true)
+
+            //We are initializing PopUp Views with title and description parameters of Parse Object
+
             initPopupViewControls(
                 parseObject.getString("title")!!,
                 parseObject.getString("description")!!
             )
+
             alertDialogBuilder.setView(popupInputDialogView)
             val alertDialog = alertDialogBuilder.create()
             alertDialog.show()
 
-            saveTodoButton?.setOnClickListener { view2 ->
+            saveTodoButton?.setOnClickListener { saveButtonView ->
                 if (titleInput?.text.toString().isNotEmpty() && descriptionInput?.text.toString().isNotEmpty()) {
                     alertDialog.cancel()
                     progressDialog?.show()
-                    val query = ParseQuery.getQuery<ParseObject>("Todo")
-                    query.getInBackground(parseObject.objectId) { todo, e ->
-                        if (e == null) {
-                            todo.put("title", titleInput?.text.toString())
-                            todo.put("description", descriptionInput?.text.toString())
-                            todo.saveInBackground { e1->
-                                progressDialog?.dismiss()
-                                if (e1 == null) {
-                                    getTodoList()
-                                } else {
-                                    showAlert("Error", e1.message!!)
-                                }
-                             }
+                    parseObject.put("title", titleInput?.text.toString())
+                    parseObject.put("description", descriptionInput?.text.toString())
+                    parseObject.saveInBackground { e1 ->
+                        progressDialog?.dismiss()
+                        if (e1 == null) {
+                            getTodoList()
                         } else {
-                            progressDialog?.dismiss()
-                            showAlert("Error", e.message!!)
+                            showAlert("Error", e1.message!!)
                         }
                     }
                 } else {
